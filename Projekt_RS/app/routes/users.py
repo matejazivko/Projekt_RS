@@ -1,13 +1,16 @@
 from fastapi import APIRouter, HTTPException
-from app.models import User
+from app.models import UserRegister, UserLogin
 from pydantic import BaseModel
 import boto3
 import logging
+import bcrypt
+import traceback
 
 logging.basicConfig(level=logging.DEBUG)
-router = APIRouter()
+logger = logging.getLogger(__name__)
 
-dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:8001", region_name="eu-west-1")
+
+dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:8000", region_name="eu-west-1")
 users_table = dynamodb.Table('users')
 
 class User(BaseModel):
@@ -15,38 +18,50 @@ class User(BaseModel):
     email: str
     password: str
     
+router = APIRouter()
 @router.post("/register")
-def register_user(user:User):
-    response = users_table.get_item(Key={"username": user.username})
-    if "Item" in response:
-        raise HTTPException(status_code=400, detail="Korisnik već postoji")
+def register_user(user:UserRegister):
+    try:
+        response = users_table.get_item(Key={"username": user.username})
+        if "Item" in response:
+            raise HTTPException(status_code=400, detail="Korisnik već postoji")
     
-    users_table.put_item(Item={
-        "username": user.username,
-        "email": user.email,
-        "password": user.password
-    })
-    return {"message": f"Korisnik {user.username} uspješno registriran"}
+        hashed_password = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt())
+       
+        
+        users_table.put_item(Item={
+            "username": user.username,
+            "email": user.email,
+            "password": hashed_password.decode("utf-8")
+            
+        })
+      
+        return {"message": f"Korisnik {user.username} uspješno registriran"}
+
+    except Exception as e:
+         logger.exception(f"Greška pri registraciji korisnika: {user.username}")
+    error_message = f"Greška na serveru: {str(e)}"  
+    raise HTTPException(status_code=500, detail=error_message)
+
 
 @router.post("/login")
-def login(user: User):
+def login(user: UserLogin):
     try:
-        logging.debug(f"Pokušaj prijave korisnika: {user.username}")
+        
         response = users_table.get_item(Key={"username": user.username})
         if "Item" not in response:
-            logging.debug(f"Korisnik s korisničkim imenom {user.username} nije pronađen")
-            raise HTTPException (status_code=400, detail="Pogrešno korisničko ime ili lozinka")
+            raise HTTPException (status_code=404, detail="Pogrešno korisničko ime")
     
         stored_user = response["Item"]
         logging.debug(f"Pronađen korisnik: {stored_user}")
         
-        if stored_user["password"] != user.password:
+        if not bcrypt.checkpw(user.password.encode ("utf-8"), stored_user["password"].encode("utf-8")):
             logging.error(f"Pogrešna lozinka za korisnika {user.username}")
             raise HTTPException(status_code=400, detail="Pogrešna lozinka")
         
-        logging.debug(f"USpješna prijava za korisnika {user.username}")
-        return {"message": f"Dobrodošao {user.username}!"}
+        return {"message": f"Dobrodošli {user.username}!"}
 
     except Exception as e:
         logging.exception(f"Greška pri prijavi korisnika: {user.username}")
+        logging.error(f"Stack Trace: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Greška na serveru")
