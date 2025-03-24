@@ -6,5 +6,7 @@ services:
     ports:
       - "8000:8000"  
     environment:
-      - "DYNAMODB_LOCAL=true"
+      - DBPATH=/data
     command: -jar DynamoDBLocal.jar -inMemory -sharedDb
+    volumes:
+    - ./data:/data

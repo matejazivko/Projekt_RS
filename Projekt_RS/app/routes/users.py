@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from app.models import UserRegister, UserLogin
 from pydantic import BaseModel
+from app.database import users_table 
+from app.database import dynamodb
 import boto3
 import logging
 import bcrypt
@@ -11,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:8000", region_name="eu-west-1")
-users_table = dynamodb.Table('users')
+
 
 class User(BaseModel):
     username: str

@@ -9,4 +9,4 @@ app.include_router(contacts.router)
 
 @app.get("/")
 def home():
-    return {"message": "Dobrodošli na API aplikacije Kuće za odomor"}
+    return {"message": "Dobrodošli na API aplikacije Kuće za odmor"}
