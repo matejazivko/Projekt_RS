@@ -18,7 +18,7 @@ class House(BaseModel):
 
 class Comment(BaseModel):
     username: str
-    house_name: str
+    house_id: str
     content: str
 
 class Contact(BaseModel):

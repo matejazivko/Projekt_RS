@@ -37,6 +37,7 @@ async def add_houses(
     image_path = save_image(image) if image else None
 
     try:
+        print(f"Spremam kuću {name}")
         houses_table.put_item(
             Item={
                 "houses_id": houses_id,
@@ -45,6 +46,7 @@ async def add_houses(
                 "image": image_path
             }
         )
+        print(f"Kuća {name}je pohranjena u bazu")
         return {"message": f"Kuća {name} je dodana", "houses_id": houses_id, "image_path": image_path}
     except ClientError as e:
         raise HTTPException(status_code=500, detail=f"Greška kod dodavanja kuće: {e.response['Error']['Message']}")

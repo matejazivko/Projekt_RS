@@ -38,9 +38,11 @@ def create_tables():
     )
     create_table_if_not_exists(
         "comments",
-        [{"AttributeName": "comment_id", "KeyType": "HASH"}],
-        [{"AttributeName": "comment_id", "AttributeType": "S"}]
+        [{"AttributeName": "house_id", "KeyType": "HASH"}, {"AttributeName": "username", "KeyType": "RANGE"}],
+        [{"AttributeName": "house_id", "AttributeType": "S"}, {"AttributeName": "username", "AttributeType": "S"}]
     )
 
 create_tables()
 users_table = dynamodb.Table('users') 
+houses_table = dynamodb.Table('houses')
+comments_table = dynamodb.Table ('comments')
