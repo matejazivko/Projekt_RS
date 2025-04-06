@@ -1,7 +1,13 @@
 import boto3
 from botocore.exceptions import ClientError
 
-dynamodb = boto3.resource('dynamodb', endpoint_url="http://localhost:8000", region_name="eu-west-1")
+dynamodb = boto3.resource(
+    'dynamodb', 
+    endpoint_url="http://localhost:8000",
+    region_name="eu-west-1",
+    aws_access_key_id='fakeMyKeyId',
+    aws_secret_access_key='fakeSecretAccessKey'
+    )
 
 def create_table_if_not_exists (table_name, key_schema, attribute_definitions):
     try:
@@ -41,8 +47,14 @@ def create_tables():
         [{"AttributeName": "house_id", "KeyType": "HASH"}, {"AttributeName": "username", "KeyType": "RANGE"}],
         [{"AttributeName": "house_id", "AttributeType": "S"}, {"AttributeName": "username", "AttributeType": "S"}]
     )
+    create_table_if_not_exists(
+        "contacts",
+        [{"AttributeName": "house_name", "KeyType": "HASH"}, {"AttributeName": "sender_email", "KeyType": "RANGE"}],
+        [{"AttributeName": "house_name", "AttributeType": "S"}, {"AttributeName": "sender_email", "AttributeType": "S"}]
+    )
 
 create_tables()
 users_table = dynamodb.Table('users') 
 houses_table = dynamodb.Table('houses')
 comments_table = dynamodb.Table ('comments')
+contacts_table = dynamodb.Table('contacts')

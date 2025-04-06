@@ -7,6 +7,6 @@ services:
       - "8000:8000"  
     environment:
       - DBPATH=/data
-    command: -jar DynamoDBLocal.jar -inMemory -sharedDb
+    command: -jar DynamoDBLocal.jar -sharedDb 
     volumes:
     - ./data:/data
