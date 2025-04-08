@@ -39,18 +39,23 @@ def create_tables():
     )
     create_table_if_not_exists(
         "houses",
-        [{"AttributeName": "houses_id", "KeyType": "HASH"}],
-        [{"AttributeName": "houses_id", "AttributeType": "S"}]
+        [{"AttributeName": "housesId", "KeyType": "HASH"}],
+        [{"AttributeName": "housesId", "AttributeType": "S"}]
     )
     create_table_if_not_exists(
         "comments",
-        [{"AttributeName": "house_id", "KeyType": "HASH"}, {"AttributeName": "username", "KeyType": "RANGE"}],
-        [{"AttributeName": "house_id", "AttributeType": "S"}, {"AttributeName": "username", "AttributeType": "S"}]
+        [{"AttributeName": "houseId", "KeyType": "HASH"}, {"AttributeName": "username", "KeyType": "RANGE"}],
+        [{"AttributeName": "houseId", "AttributeType": "S"}, {"AttributeName": "username", "AttributeType": "S"}]
     )
     create_table_if_not_exists(
         "contacts",
         [{"AttributeName": "house_name", "KeyType": "HASH"}, {"AttributeName": "sender_email", "KeyType": "RANGE"}],
         [{"AttributeName": "house_name", "AttributeType": "S"}, {"AttributeName": "sender_email", "AttributeType": "S"}]
+    )
+    create_table_if_not_exists(
+        "images",
+        [{"AttributeName": "image_id", "KeyType": "HASH"}],
+        [{"AttributeName": "image_id", "AttributeType": "S"}]
     )
 
 create_tables()

@@ -43,7 +43,7 @@ def test_get_houses():
         print(f"Greška prilikom dohvaćanja kuća: {e}")
 
 def test_add_comment():
-    comment = Comment(username="TestUser", house_id="ID kuće", content="komentar")
+    comment = Comment(username="TestUser", houseId="ID kuće", content="komentar")
     try:
         response = add_comment(comment)
         print(f"Komentar uspješno dodan: {response}")

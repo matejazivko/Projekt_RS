@@ -14,20 +14,20 @@ def add_comment(comment: Comment):
         raise HTTPException(status_code=403, detail="Prijavite se kako biste dodali komentar")
     try:
         comments_table.put_item(Item={
-            "house_id": comment.house_id,
+            "houseId": comment.houseId,
             "username": comment.username,
             "content": comment.content
         })
-        return {"message": f"Dodan komentar za kuću {comment.house_id} od korisnika {comment.username}"}
+        return {"message": f"Dodan komentar za kuću {comment.houseId} od korisnika {comment.username}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail = f"Greška prilikom dodavanja komentara: {str(e)}")
     
-@router.get("/comments/{house_id}")
-def get_comments(house_id: str):
+@router.get("/comments/{houseId}")
+def get_comments(houseId: str):
     try:
-        response = comments_table.query(KeyConditionExpression=Key('house_id').eq(house_id))
+        response = comments_table.query(KeyConditionExpression=Key('house_id').eq(houseId))
         comments = response.get("Items", [])
-        house = houses_table.get_item(Key={"houses_id": house_id}).get("Item")
+        house = houses_table.get_item(Key={"houses_id": houseId}).get("Item")
         house_name = house.get("house_name", "Naziv kuće") if house else "Naziv kuće"
         for comment in comments:
             comment["house_name"] = house_name
@@ -36,12 +36,12 @@ def get_comments(house_id: str):
         raise HTTPException(status_code=500, detail=f"Greška prilikom dohvaćanja komentara: {str(e)}")
 
 @router.put("/update_comment")
-def update_comment(house_id: str, new_content: str, username: str):
+def update_comment(houseId: str, new_content: str, username: str):
     if not username:
         raise HTTPException(status_code=403, detail="Prijavite se kako biste ažurirali svoj komentar")
     try:
         comments_table.put_item(Item={
-            "house_id": house_id,
+            "houseId": houseId,
             "username": username,
             "content": new_content
         })
@@ -51,11 +51,11 @@ def update_comment(house_id: str, new_content: str, username: str):
     
   
 @router.delete("/delete_comment")
-def delete_comment(house_id: str, username: str):
+def delete_comment(houseId: str, username: str):
     if not username:
         raise HTTPException(status_code=403, detail="Prijavite se kako biste obrisali komentar")
     try:
-            comments_table.delete_item(Key={"house_id": house_id, "username": username})
+            comments_table.delete_item(Key={"houseId": houseId, "username": username})
             return {"message": "Komentar uspješno obrisan"}
     except Exception as e:
         raise HTTPException(status_code=404, detail="Komentar nije pronađen ili komentar koji želite obrisati niste Vi dodali")

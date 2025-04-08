@@ -1,10 +1,30 @@
-version: "3.8"
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
+    depends_on:
+      - dynamodb
+
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: vue-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
   dynamodb:
     image: amazon/dynamodb-local
     container_name: dynamodb-local
     ports:
-      - "8000:8000"  
+      - "8001:8000"  
     environment:
       - DBPATH=/data
     command: -jar DynamoDBLocal.jar -sharedDb 
