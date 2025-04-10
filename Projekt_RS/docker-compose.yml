@@ -3,11 +3,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - PYTHONPATH=/app
     container_name: fastapi-backend
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/app
+      - .:/app
     depends_on:
       - dynamodb
 
